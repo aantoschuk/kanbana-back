@@ -18,7 +18,7 @@ export class DbService implements OnModuleInit {
         });
         await pool.connect();
         this.db = drizzle(pool);
-        console.log("DB connected");
+        console.log("Connected to the database");
     }
 
     getDB() {

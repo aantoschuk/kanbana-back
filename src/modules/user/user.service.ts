@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { Injectable } from "@nestjs/common";
 
 // modules & functions
@@ -38,5 +39,12 @@ export class UserService {
         const db = this.dbService.getDB();
         const users = db.select().from(usersTable);
         return users;
+    }
+
+    async findOne(email: string)  {
+        const db = this.dbService.getDB();
+        const user = await db.select().from(usersTable).where(eq(usersTable.email, email))
+
+        return user[0]
     }
 }
