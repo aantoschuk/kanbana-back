@@ -7,3 +7,12 @@ export class SignInDTO {
     @IsNotEmpty()
     password: string;
 }
+
+export class CreateRefreshTokenDto {
+    userEmail: string;
+    hash: string;
+    userAgent?: string;
+    ipAddress?: string;
+    createdAt: Date;
+    expiresAt: Date;
+}

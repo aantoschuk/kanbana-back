@@ -14,3 +14,5 @@ async function bootstrap() {
 }
 
 bootstrap();
+
+// add logger and better messaging

@@ -1,14 +1,8 @@
-import {
-    Get,
-    Body,
-    Post,
-    UsePipes,
-    Controller,
-    ValidationPipe,
-} from "@nestjs/common";
+import { Get, Controller, Param, UseGuards } from "@nestjs/common";
 
 import { UserService } from "./user.service";
-import { CreateUserDTO } from "./dto/user.dto";
+
+import { AuthGuard } from "../auth/auth.guard";
 
 @Controller("user")
 export class UserController {
@@ -24,11 +18,12 @@ export class UserController {
         return this.userService.get();
     }
 
-    // NOTE: only for test dev purpose, should be in auth
-    @Post()
-    @UsePipes(new ValidationPipe({ transform: true }))
-    async create(@Body() createUserDTO: CreateUserDTO) {
-        const user = await this.userService.createUser(createUserDTO);
-        return user;
+    @UseGuards(AuthGuard)
+    @Get(":email")
+    async getOne(@Param() params: { email: string }) {
+        const user = await this.userService.findOne(params.email);
+
+        const { password, ...cleanUser } = user;
+        return cleanUser;
     }
 }
