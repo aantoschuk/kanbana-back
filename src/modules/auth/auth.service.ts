@@ -53,12 +53,12 @@ export class AuthService {
 
         // if there is no user in database, then user is not registered
         if (!user) {
-            throw new NotFoundException();
+            throw new NotFoundException("User is not registered");
         }
 
         const verified = verifyPassword(user.password, password);
         if (!verified) {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException("Wrong Credentials");
         }
 
         const payload = { email: user.email, roles: user.roles };

@@ -30,7 +30,7 @@ export class AuthController {
         private refreshTokenService: RefreshTokenService,
     ) {}
 
-    @Post("login")
+    @Post("signin")
     @UsePipes(new ValidationPipe({ transform: true }))
     async signIn(
         @Req() req: Request,
@@ -70,7 +70,6 @@ export class AuthController {
     @HttpCode(HttpStatus.CREATED)
     @Post("refresh")
     async refreshToken(
-        @Body("refreshToken") rawToken: string,
         @Req() req: RequestWithUser,
         @Res({ passthrough: true }) res: Response,
     ) {
@@ -78,7 +77,13 @@ export class AuthController {
             const email = req?.user?.email;
 
             if (!email) {
-                throw new UnauthorizedException();
+                throw new UnauthorizedException("no email");
+            }
+
+            const rawToken = req.cookies.refreshToken;
+
+            if (!rawToken) {
+                throw new UnauthorizedException("No refresh token");
             }
 
             const tokenRecord = await this.refreshTokenService.validate(
@@ -108,8 +113,8 @@ export class AuthController {
             return {
                 token: newAccessToken,
             };
-        } catch {
-            throw new UnauthorizedException();
+        } catch (error) {
+            console.log(error);
         }
     }
 
