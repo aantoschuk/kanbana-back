@@ -1,15 +1,15 @@
 import { Redis } from "ioredis";
 import { Controller, Get } from "@nestjs/common";
+import { InjectRedis } from "@nestjs-modules/ioredis";
+import { RedisHealthIndicator } from "@liaoliaots/nestjs-redis-health";
 
 import {
     HealthCheck,
     HealthCheckResult,
     HealthCheckService,
 } from "@nestjs/terminus";
-import { RedisHealthIndicator } from "@liaoliaots/nestjs-redis-health";
 
 import { AppService } from "./app.service";
-import { InjectRedis } from "@nestjs-modules/ioredis";
 
 @Controller()
 export class AppController {

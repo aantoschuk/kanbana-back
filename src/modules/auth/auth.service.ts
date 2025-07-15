@@ -21,10 +21,7 @@ export class AuthService {
     ) {}
 
     // sing up function
-    async signUp(
-        userDto: CreateUserDTO,
-        refreshTokenData: TRefreshTokenProps,
-    ) {
+    async signUp(userDto: CreateUserDTO, refreshTokenData: TRefreshTokenProps) {
         // create a new user
         const user = await this.userService.createUser(userDto);
 

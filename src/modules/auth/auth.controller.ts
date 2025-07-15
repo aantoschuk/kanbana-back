@@ -114,6 +114,7 @@ export class AuthController {
                 token: newAccessToken,
             };
         } catch (error) {
+            throw new UnauthorizedException("Something Happened")
             console.log(error);
         }
     }
@@ -122,17 +123,18 @@ export class AuthController {
     @Post("logout")
     async logout(
         @Req() req: RequestWithUser,
-        @Body("refreshToken") refreshToken: string,
+        // @Body("refreshToken") refreshToken: string,
         @Res({ passthrough: true }) res: Response,
     ) {
         const email = req.user?.email;
-        if (!email || !refreshToken) {
+        const rawToken = req.cookies.refreshToken;
+        if (!email || !rawToken) {
             throw new UnauthorizedException();
         }
 
         const tokenRecord = await this.refreshTokenService.validate(
             email,
-            refreshToken,
+            rawToken,
         );
 
         if (tokenRecord) {
@@ -151,7 +153,7 @@ export class AuthController {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production", // set true in prod, false in dev
             sameSite: "lax",
-            path: "/auth/refresh", // cookie only sent to refresh endpoint
+            path: "/auth", // cookie only sent to refresh endpoint
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
         });
     }

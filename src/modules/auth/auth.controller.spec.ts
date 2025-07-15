@@ -127,6 +127,7 @@ describe("AuthController", () => {
                 user: { email: "test@example.com" },
                 headers: { "user-agent": "test-agent" },
                 ip: "127.0.0.1",
+                cookies: { refreshToken: "old-refresh-token" },
             } as any;
 
             const res = {
@@ -144,11 +145,7 @@ describe("AuthController", () => {
             });
             (jwtService.sign as jest.Mock).mockReturnValue("new-jwt-token");
 
-            const result = await authController.refreshToken(
-                "old-refresh-token",
-                req,
-                res,
-            );
+            const result = await authController.refreshToken(req, res);
 
             expect(refreshTokenService.validate).toHaveBeenCalledWith(
                 "test@example.com",
@@ -176,10 +173,11 @@ describe("AuthController", () => {
                 user: {},
                 headers: {},
                 ip: "127.0.0.1",
+                cookies: { refreshToken: "old-refresh-token" },
             } as any;
 
             await expect(
-                authController.refreshToken("token", req, {} as any),
+                authController.refreshToken(req, {} as any),
             ).rejects.toThrow(UnauthorizedException);
         });
 
@@ -193,7 +191,7 @@ describe("AuthController", () => {
             (refreshTokenService.validate as jest.Mock).mockResolvedValue(null);
 
             await expect(
-                authController.refreshToken("token", req, {} as any),
+                authController.refreshToken(req, {} as any),
             ).rejects.toThrow(UnauthorizedException);
         });
     });
@@ -202,6 +200,9 @@ describe("AuthController", () => {
         it("should revoke refresh token and clear cookie", async () => {
             const req = {
                 user: { email: "test@example.com" },
+                cookies: {
+                    refreshToken: "refresh-token",
+                },
             } as any;
 
             const res = {
@@ -215,11 +216,7 @@ describe("AuthController", () => {
                 undefined,
             );
 
-            const result = await authController.logout(
-                req,
-                "refresh-token",
-                res,
-            );
+            const result = await authController.logout(req, res);
 
             expect(refreshTokenService.validate).toHaveBeenCalledWith(
                 "test@example.com",
@@ -234,7 +231,10 @@ describe("AuthController", () => {
 
         it("should throw UnauthorizedException if email or token missing", async () => {
             await expect(
-                authController.logout({ user: {} } as any, "", {} as any),
+                authController.logout(
+                    { user: {}, cookies: {} } as any,
+                    {} as any,
+                ),
             ).rejects.toThrow(UnauthorizedException);
         });
     });

@@ -1,18 +1,36 @@
 import { Test, TestingModule } from "@nestjs/testing";
+import { HealthCheckService } from "@nestjs/terminus";
+import { RedisHealthIndicator } from "@liaoliaots/nestjs-redis-health";
 
-import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+import { AppController } from "./app.controller";
+
+const RedisConnectionToken = 'default_IORedisModuleConnectionToken';
 
 describe("AppController", () => {
     let appController: AppController;
 
-    beforeEach(async () => {
-        const app: TestingModule = await Test.createTestingModule({
+        beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
             controllers: [AppController],
-            providers: [AppService],
+            providers: [
+                AppService,
+                {
+                    provide: HealthCheckService,
+                    useValue: { check: jest.fn() },
+                },
+                {
+                    provide: RedisHealthIndicator,
+                    useValue: { checkHealth: jest.fn() },
+                },
+                {
+                    provide: RedisConnectionToken,
+                    useValue: {}, 
+                },
+            ],
         }).compile();
 
-        appController = app.get<AppController>(AppController);
+        appController = module.get<AppController>(AppController);
     });
 
     describe("root", () => {
